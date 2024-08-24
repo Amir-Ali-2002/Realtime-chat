@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Chat</title>
+    <style>
+        #chatContainer { max-width: 600px; margin: 50px auto; }
+        #messages { border: 1px solid #ddd; padding: 10px; height: 300px; overflow-y: scroll; }
+        #messageInput { width: calc(100% - 60px); padding: 10px; }
+        #sendButton { width: 50px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <h2>Chat with Us</h2>
+        <div id="messages"></div>
+        <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off">
+        <button id="sendButton">Send</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const messages = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        socket.on('chatMessage', (msg) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = msg;
+            messages.appendChild(messageElement);
+            messages.scrollTop = messages.scrollHeight;
+        });
+
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message) {
+                socket.emit('chatMessage', message);
+                messageInput.value = '';
+            }
+        });
+
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
+
